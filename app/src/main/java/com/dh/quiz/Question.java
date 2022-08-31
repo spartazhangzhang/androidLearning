@@ -3,7 +3,15 @@ package com.dh.quiz;
 public class Question {
     private int mTextResId;
     private boolean mAnswerTrue;
+    private boolean mAnswered = false;
 
+    public boolean hasAnswered() {
+        return mAnswered;
+    }
+
+    public void setAnswered(boolean mAnswered) {
+        this.mAnswered = mAnswered;
+    }
 
     public Question(int mTextResId, boolean mAnswerTrue) {
         this.mTextResId = mTextResId;

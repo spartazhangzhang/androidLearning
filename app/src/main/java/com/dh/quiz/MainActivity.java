@@ -42,8 +42,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mQuestionTextView = findViewById(R.id.question_text);
-        updateQuestion();
-
         mTrueButton = findViewById(R.id.true_button);
         mTrueButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
                 checkAnswer(false);
             }
         });
+        updateQuestion();
 
         mNextButton = findViewById(R.id.next_button);
         mNextButton.setOnClickListener(new View.OnClickListener() {
@@ -84,10 +83,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateQuestion(){
         int question = mQuestionBank[mCurrentIndex].getmTextResId();
+        boolean hasAnswered =  mQuestionBank[mCurrentIndex].hasAnswered();
+        if (hasAnswered){
+            mTrueButton.setEnabled(false);
+            mFalseButton.setEnabled(false);
+        }else {
+            mTrueButton.setEnabled(true);
+            mFalseButton.setEnabled(true);
+        }
         mQuestionTextView.setText(question);
     }
 
     private void checkAnswer(boolean userPressedTrue){
+        mTrueButton.setEnabled(false);
+        mFalseButton.setEnabled(false);
         boolean anwserIsTrue = mQuestionBank[mCurrentIndex].ismAnswerTrue();
         int messageResId;
         if (userPressedTrue == anwserIsTrue){
@@ -96,9 +105,9 @@ public class MainActivity extends AppCompatActivity {
             messageResId = R.string.incorrect;
         }
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
+
+        mQuestionBank[mCurrentIndex].setAnswered(true);
     }
-
-
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
