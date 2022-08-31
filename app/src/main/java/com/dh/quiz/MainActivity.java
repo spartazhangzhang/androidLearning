@@ -1,9 +1,12 @@
 package com.dh.quiz;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -17,6 +20,10 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton mPrevButton;
     private TextView mQuestionTextView;
 
+    private static final String TAG = "QuizActivity";
+    private static final String KEY_INDEX = "index";
+
+
     private Question[] mQuestionBank = new Question[]{
             new Question(R.string.question_americas, true),
             new Question(R.string.question_china, true),
@@ -27,6 +34,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate: called");
+        if (savedInstanceState != null){
+            // recovery index from state when system called onCreate function
+            mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
+        }
         setContentView(R.layout.activity_main);
 
         mQuestionTextView = findViewById(R.id.question_text);
@@ -85,4 +97,45 @@ public class MainActivity extends AppCompatActivity {
         }
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
     }
+
+
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.i(TAG, "onSave Instance State");
+        //save index to state to avoid lost index
+        outState.putInt(KEY_INDEX, mCurrentIndex);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause: called");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop: called");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart: called");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume: called");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: called");
+    }
+    
 }
