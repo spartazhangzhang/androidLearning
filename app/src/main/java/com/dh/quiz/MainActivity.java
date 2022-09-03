@@ -1,12 +1,18 @@
 package com.dh.quiz;
+/*
+* 1. 创建新的activity以及配套布局
+* 2. 从一个activity中启动另一个activity。
+* 3. 在父activity与子activity中传递数据
+* */
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -16,13 +22,15 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
     private Button mTrueButton;
     private Button mFalseButton;
+    private Button mCheatButton;
     private ImageButton mNextButton;
     private ImageButton mPrevButton;
     private TextView mQuestionTextView;
+    private boolean mIsCheater;
 
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
-
+    private static final int REQUEST_CODE_CHEAT = 0;
 
     private Question[] mQuestionBank = new Question[]{
             new Question(R.string.question_americas, true),
@@ -40,6 +48,21 @@ public class MainActivity extends AppCompatActivity {
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
         }
         setContentView(R.layout.activity_main);
+
+        // cheat button
+        mCheatButton = findViewById(R.id.cheat_button);
+        mCheatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // start cheat activity
+                // 基于intent的通信
+                boolean isAnwserTrue = mQuestionBank[mCurrentIndex].ismAnswerTrue();
+                Intent intent = CheatActivity.newIntent(MainActivity.this, isAnwserTrue);
+                startActivityForResult(intent, REQUEST_CODE_CHEAT);
+                // 使用intent extra
+
+            }
+        });
 
         mQuestionTextView = findViewById(R.id.question_text);
         updateQuestion();
@@ -65,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;
+                mIsCheater = false;
                 updateQuestion();
             }
         });
@@ -90,14 +114,29 @@ public class MainActivity extends AppCompatActivity {
     private void checkAnswer(boolean userPressedTrue){
         boolean anwserIsTrue = mQuestionBank[mCurrentIndex].ismAnswerTrue();
         int messageResId;
-        if (userPressedTrue == anwserIsTrue){
-            messageResId = R.string.correct;
-        }else {
-            messageResId = R.string.incorrect;
+        if(mIsCheater){
+            messageResId = R.string.judgement_toast;
+        }else{
+            if (userPressedTrue == anwserIsTrue){
+                messageResId = R.string.correct;
+            }else {
+                messageResId = R.string.incorrect;
+            }
         }
+
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == REQUEST_CODE_CHEAT) {
+            if (data == null) {
+                return;
+            }
+            mIsCheater = CheatActivity.wasAnswerShown(data);
+        }
+    }
 
 
     @Override
